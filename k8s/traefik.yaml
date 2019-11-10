@@ -1,0 +1,43 @@
+repeat: eachDomain
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: 'random-meal-https'
+  namespace: 'random-meal'
+spec:
+  entryPoints:
+    - https
+  routes:
+  - match: Host(`meal.haradore.co.uk`)
+    kind: Rule
+    services:
+    - name: 'random-meal-service'
+      port: 80
+  tls:
+    secretName: 'random-meal-tls'
+---
+repeat: eachDomain
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: 'random-meal-http'
+  namespace: 'random-meal'
+spec:
+  entryPoints:
+    - http
+  routes:
+    - match: Host(`meal.haradore.co.uk`)
+      kind: Rule
+      services:
+      - name: 'random-meal-service'
+        port: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: ssl-redirect
+  namespace: 'random-meal'
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: "true"
